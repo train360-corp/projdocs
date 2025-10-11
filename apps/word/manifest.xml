@@ -128,7 +128,7 @@
         <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
 
         <!-- Button 1: Save -->
-        <bt:String id="SaveButton.Label" DefaultValue="Save"/>
+        <bt:String id="SaveButton.Label" DefaultValue="Save Document"/>
 
         <!-- Button 2: Save As New Version -->
         <bt:String id="SaveAsNewVersionButton.Label" DefaultValue="Save as New Version" />
