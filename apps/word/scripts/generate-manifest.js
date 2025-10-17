@@ -26,12 +26,13 @@ const manifestOutPath = env === "dev"
 const xml = fs.readFileSync(manifestTemplatePath, "utf8");
 
 const replacements = {
-  dev: "https://localhost:3000/commands.html",
-  prod: "https://word.projdocs.com/commands.html",
+  dev: "https://localhost:3000/src/surfaces/ribbon/index.html",
+  prod: "https://word.projdocs.com/src/surfaces/ribbon/index.html",
 };
 
 const updated = xml.replace(
-  /https:\/\/word\.projdocs\.com\/commands\.html/g,
+  // src/surfaces/ribbon/index.html
+  /https:\/\/word\.projdocs\.com\/src\/surfaces\/ribbon\/index\.html/g,
   replacements[env] || replacements.prod
 );
 

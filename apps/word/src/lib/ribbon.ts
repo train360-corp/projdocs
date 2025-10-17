@@ -1,4 +1,4 @@
-import { setButtons } from "@workspace/word/lib/buttons";
+import { setButtons } from "@workspace/word/lib/utils";
 import { Actions } from "@workspace/word/lib/actions";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 

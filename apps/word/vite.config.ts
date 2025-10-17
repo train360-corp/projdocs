@@ -19,7 +19,7 @@ export default defineConfig({
       ],
     }),
   ],
-  root: path.resolve(__dirname, "src"),
+  root: __dirname,
   publicDir: path.resolve(__dirname, "public"),
   base: "./",
   resolve: {
@@ -33,8 +33,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, "src/index.html"),
-        commands: path.resolve(__dirname, "src/commands.html"),
+        main: path.resolve(__dirname, "index.html"),
+        commands: path.resolve(__dirname, "src/surfaces/ribbon/index.html"),
       }
     }
   },
