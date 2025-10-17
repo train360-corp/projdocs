@@ -6,7 +6,8 @@ import { getTrayWindow } from "@workspace/desktop/electron/src/tray";
 import { queryParamsToRequest } from "@workspace/packages/consts/auth";
 import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
 
-// ---- deep link handler ----
+
+
 export async function handleDeepLink(link: string) {
   try {
     const url = new URL(link);

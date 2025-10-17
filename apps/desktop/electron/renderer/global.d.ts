@@ -16,7 +16,7 @@ export type TypeofResult =
 
 declare global {
   interface Window extends IPCHandlers {
-    app: {
+    app: IPCHandlers["app"] & {
       on: (event: Events, handler: () => unknown) => (() => void);
     }
   }
