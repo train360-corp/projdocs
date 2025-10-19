@@ -1,5 +1,6 @@
 import { baseUrl } from "@workspace/word/lib/utils";
 import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
+import { CONSTANTS } from "@workspace/word/lib/consts";
 
 
 
@@ -25,7 +26,7 @@ export const saveAsNewFile: Action = async () => {
   console.log("✅ saveAsNewFile() was called");
 
 
-  const auth = await fetch("https://localhost:9305/user").then<AuthSettings | null>(async (resp) => {
+  const auth = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`).then<AuthSettings | null>(async (resp) => {
     if (resp.status === 400) {
       throw new Error("not logged in");
     } else if (resp.status === 200) {

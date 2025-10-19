@@ -1,14 +1,15 @@
-import { type Icon, } from "@tabler/icons-react";
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, } from "@workspace/ui/components/sidebar";
 import { NavSectionButton } from "@workspace/ui/components/nav-section-button";
 import { ReactNode } from "react";
 
 
 
+export const NavSectionIcons = [];
+
 export type NavSectionItem = {
   name: string;
   url: string;
-  icon: Icon;
+  icon: number;
   isComingSoon?: true;
 }
 
@@ -17,22 +18,29 @@ export type NavSection = {
   items: readonly NavSectionItem[];
 }
 
-export function NavSection({ section, Button }: {
+type NavSectionProps = {
   section: NavSection;
-  Button?: (props: {
+  Button: (props: {
     item: NavSectionItem;
   }) => ReactNode;
-}) {
+} | {
+  section: NavSection;
+  type: "FOO";
+}
+
+export function NavSection(props: NavSectionProps) {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      {section.title !== undefined && (
-        <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+      {props.section.title !== undefined && (
+        <SidebarGroupLabel>{props.section.title}</SidebarGroupLabel>
       )}
       <SidebarMenu>
-        {section.items.map((item, index) => (
+        {props.section.items.map((item, index) => (
           <SidebarMenuItem key={item.name}>
-            {Button ? <Button item={item}/> : (<NavSectionButton item={item}/>)}
+            {"Button" in props ? <props.Button item={item}/> : (
+              <NavSectionButton item={item}/>
+            )}
             {/*<DropdownMenu>*/}
             {/*  <DropdownMenuTrigger asChild>*/}
             {/*    <SidebarMenuAction*/}

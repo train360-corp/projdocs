@@ -8,7 +8,14 @@ import {
   IconUsers
 } from "@tabler/icons-react";
 
-
+export const icons = [
+  IconDashboard,
+  IconUsers,
+  IconListDetails,
+  IconDatabase,
+  IconDatabaseStar,
+  IconFolderStar
+]
 
 export const sections: readonly NavSection[] = [
   {
@@ -16,19 +23,19 @@ export const sections: readonly NavSection[] = [
     items: [
       {
         name: "Dashboard",
-        icon: IconDashboard,
+        icon: 0,
         url: "/dashboard"
       },
       {
         name: "Team",
         url: "/dashboard/team",
-        icon: IconUsers,
+        icon: 1,
         isComingSoon: true
       },
       {
         name: "Lifecycle",
         url: "/dashboard/lifecycle",
-        icon: IconListDetails,
+        icon: 2,
         isComingSoon: true
       }
     ]
@@ -39,17 +46,17 @@ export const sections: readonly NavSection[] = [
       {
         name: "Clients",
         url: "/dashboard/clients",
-        icon: IconDatabase,
+        icon: 3,
       },
       {
         name: "My Clients",
         url: "/dashboard/my-clients",
-        icon: IconDatabaseStar,
+        icon: 4,
       },
       {
         name: "My Projects",
         url: "/dashboard/my-projects",
-        icon: IconFolderStar,
+        icon: 5,
         isComingSoon: true
       },
     ]

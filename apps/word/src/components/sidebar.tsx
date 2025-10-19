@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
 import { ComponentProps } from "react";
-import { sections } from "@workspace/ui/components/nav-items";
+import { icons, sections } from "@workspace/ui/components/nav-items";
 import { NavSection, NavSectionItem } from "@workspace/ui/components/nav-section";
 import { Badge } from "@workspace/ui/components/badge";
 import { useAppStore } from "@workspace/word/store/app";
@@ -39,12 +39,12 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         {sections
           .filter(sec => sec.title === "Documents")
           .map((section, index) => (
-          <NavSection
-            section={section}
-            key={index}
-            Button={NavSectionButton}
-          />
-        ))}
+            <NavSection
+              section={section}
+              key={index}
+              Button={NavSectionButton}
+            />
+          ))}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto"/>*/}
       </SidebarContent>
     </Sidebar>
@@ -56,6 +56,7 @@ function NavSectionButton({ item }: {
 }) {
 
   const app = useAppStore();
+  const Icn = item.icon ? icons[item.icon] : undefined;
 
   return (
     <SidebarMenuButton
@@ -63,7 +64,7 @@ function NavSectionButton({ item }: {
       isActive={item.url === app.state.router.path}
       onClick={() => app.navigate(item.url)}
     >
-      <item.icon/>
+      {Icn && <Icn/>}
       <span>{item.name}</span>
       {item.isComingSoon && (
         <Badge
