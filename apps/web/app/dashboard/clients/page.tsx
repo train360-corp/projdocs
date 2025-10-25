@@ -10,8 +10,6 @@ import { Tables } from "@workspace/supabase/types";
 
 export default function Page() {
 
-  console.log(window.env)
-
   const [ clients, setClients ] = useState<readonly Tables<"clients">[] | undefined | null>();
   const supabase = createClient();
 

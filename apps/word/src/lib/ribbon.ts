@@ -35,7 +35,7 @@ export const Ribbon = {
       [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
     });
 
-    const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.REF);
+    const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
 
     const loggedIn = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`).then(async (resp) => {
       if (resp.status !== 200) return;

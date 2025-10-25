@@ -1,6 +1,5 @@
 import * as tus from "tus-js-client";
 import { DetailedError, OnSuccessPayload } from "tus-js-client";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { v4 } from "uuid";
 import { Tables } from "@workspace/supabase/types";
 
@@ -8,10 +7,10 @@ import { Tables } from "@workspace/supabase/types";
 
 export const uploadFile = async (supabase: SupabaseClient, options: {
   file: {
-    object: Tables<"files"> | null;
-    data: File
+    object: Pick<Tables<"files">, "id"> | null;
+    data: File | Blob;
   },
-  directory: Tables<"directories">;
+  directory: Pick<Tables<"directories">, "id">;
   bucket: string,
   onError?: (error: Error | DetailedError) => void,
   onProgress?: (progress: number) => void,
@@ -45,7 +44,7 @@ export const uploadFile = async (supabase: SupabaseClient, options: {
       metadata: JSON.stringify({
         file_id: options.file.object?.id ?? null,
         directory_id: options.directory.id,
-        filename: options.file.data.name
+        filename: "name" in options.file.data ? options.file.data.name : "unnamed"
       }),
     },
     onError: (error) => options.onError ? options.onError(error) : console.error("Upload failed:", error),

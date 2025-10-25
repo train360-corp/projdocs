@@ -3,7 +3,8 @@ export const CONSTANTS = {
     GUID: "02BAD963-836A-4517-9CF2-300D4A81FF5C"
   },
   SETTINGS: {
-    REF: "ProjDocsRef",
+    FILE_REF: "ProjDocsFileRef",
+    VERSION_REF: "ProjDocsVersionRef",
     AUTOLOAD: "ProjDocsAutoLoad",
   },
   BUTTONS: {

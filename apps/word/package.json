@@ -4,17 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "inject-manifest": "rm -rf ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/*.manifest.xml && cp ./manifest/manifest-local.xml ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/\"$(uuidgen).manifest.xml\"",
-    "validate": "office-addin-manifest validate ./manifest/manifest-local.xml",
-    "predev": "npm run build:manifest:dev && npm run validate && npm run inject-manifest",
+    "manifest:inject": "rm -rf ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/02BAD963-836A-4517-9CF2-300D4A81FF5C.manifest.xml && cp ./manifest/manifest-local.xml ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/02BAD963-836A-4517-9CF2-300D4A81FF5C.manifest.xml",
+    "manifest:validate": "office-addin-manifest validate ./manifest/manifest-local.xml",
+
+    "predev": "npm run build:manifest:dev && npm run manifest:validate && npm run manifest:inject",
     "dev": "vite",
+
     "build": "npm run build:manifest:prod && tsc -b && vite build",
     "build:manifest:dev": "node manifest/generate.js dev",
     "build:manifest:prod": "node manifest/generate.js prod",
+
     "lint": "eslint .",
+
     "preview": "vite preview",
-    "enable-debugger:word": "defaults write com.microsoft.Word OfficeWebAddinDeveloperExtras -bool true && defaults write com.microsoft.Word OfficeAddinDebuggerEnabled -bool true",
-    "disable-debugger:word": "defaults delete com.microsoft.Word OfficeWebAddinDeveloperExtras && defaults delete com.microsoft.Word OfficeAddinDebuggerEnabled"
+
+    "debugger:word:enable": "defaults write com.microsoft.Word OfficeWebAddinDeveloperExtras -bool true && defaults write com.microsoft.Word OfficeAddinDebuggerEnabled -bool true",
+    "debugger:word:disable": "defaults delete com.microsoft.Word OfficeWebAddinDeveloperExtras && defaults delete com.microsoft.Word OfficeAddinDebuggerEnabled"
   },
   "dependencies": {
     "@microsoft/office-js": "^1.1.110",
