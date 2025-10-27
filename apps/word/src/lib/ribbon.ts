@@ -37,6 +37,9 @@ export const Ribbon = {
 
     const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
 
+    console.log(documentID && typeof documentID);
+    console.log(Office.context.document.settings);
+
     const loggedIn = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`).then(async (resp) => {
       if (resp.status !== 200) return;
       const obj = await resp.json();
@@ -50,11 +53,11 @@ export const Ribbon = {
       [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
     });
     // Document already registered with backend
-    else if (typeof documentID === "string" && documentID.length > 0) await setButtons({
+    else if (typeof documentID === "number" && documentID > 0) await setButtons({
       [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: false }, // hide/disable launcher once bootstrapped
       [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: true },
       [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: true },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
+      [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: true },
     });
     else await setButtons({
         [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: false }, // launcher pressed or autoloaded; keep disabled

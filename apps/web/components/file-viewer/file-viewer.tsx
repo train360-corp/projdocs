@@ -138,6 +138,7 @@ export const FileViewer = (props: {
 
         await uploadFile(supabase, {
           file: {
+            type: "file",
             data: file,
             object: props.file
           },
@@ -213,7 +214,7 @@ export const FileViewer = (props: {
                         {version.id === (props.file.current_version_id ?? NIL) && (
                           <Badge
                             variant="default"
-                            className="h-5 min-w-5 shrink-0 rounded-full px-1 font-mono tabular-nums dark:text-white"
+                            className="h-5 min-w-5 shrink-0 rounded-full px-1 font-mono tabular-nums"
                           >
                             Current
                           </Badge>

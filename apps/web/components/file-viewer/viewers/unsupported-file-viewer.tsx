@@ -19,7 +19,7 @@ export const UnsupportedFileViewer = ({ blob, file, version }: FileViewerProps) 
         download={`${version.name.trim().replace(/\.[^/.]+$/, "")} (${file.number}.${version.version}).${version.name.trim().split(".").pop()!}`}
         className="mt-4"
       >
-        <Button className={"dark:text-white"}>{"Download File"}</Button>
+        <Button>{"Download File"}</Button>
       </a>
     </div>
   );
