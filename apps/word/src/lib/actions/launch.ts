@@ -25,9 +25,6 @@ export const launch: Action = async () => {
 
   const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
 
-  console.log(documentID && typeof documentID);
-  console.log(Office.context.document.settings);
-
   const status: Status = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`)
     .then(async (resp) => ({
       connector: {

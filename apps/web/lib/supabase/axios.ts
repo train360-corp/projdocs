@@ -1,5 +1,5 @@
 import Axios, { AxiosInstance } from "axios";
-import { createClient } from "@workspace/web/lib/supabase/client";
+import { createClient } from "@workspace/supabase/client";
 
 
 

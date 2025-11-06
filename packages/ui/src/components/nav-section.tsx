@@ -1,10 +1,14 @@
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, } from "@workspace/ui/components/sidebar";
-import { NavSectionButton } from "@workspace/ui/components/nav-section-button";
-import { ReactNode } from "react";
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@workspace/ui/components/sidebar";
+import { Badge } from "@workspace/ui/components/badge";
+import { icons } from "@workspace/ui/components/nav-items";
 
 
-
-export const NavSectionIcons = [];
 
 export type NavSectionItem = {
   name: string;
@@ -18,17 +22,21 @@ export type NavSection = {
   items: readonly NavSectionItem[];
 }
 
-type NavSectionProps = {
-  section: NavSection;
-  Button: (props: {
-    item: NavSectionItem;
-  }) => ReactNode;
-} | {
-  section: NavSection;
-  type: "FOO";
-}
+const Icon = ({ item }: {
+  item: NavSectionItem;
+}) => {
+  const Icon = item.icon ? icons[item.icon] : undefined;
+  return Icon === undefined ? undefined : <Icon/>;
+};
 
-export function NavSection(props: NavSectionProps) {
+export function NavSection(props: {
+  section: NavSection;
+  router: {
+    navigate: (url: string) => void;
+    path: string;
+  }
+}) {
+
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -36,41 +44,23 @@ export function NavSection(props: NavSectionProps) {
         <SidebarGroupLabel>{props.section.title}</SidebarGroupLabel>
       )}
       <SidebarMenu>
-        {props.section.items.map((item, index) => (
+        {props.section.items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            {"Button" in props ? <props.Button item={item}/> : (
-              <NavSectionButton item={item}/>
-            )}
-            {/*<DropdownMenu>*/}
-            {/*  <DropdownMenuTrigger asChild>*/}
-            {/*    <SidebarMenuAction*/}
-            {/*      showOnHover*/}
-            {/*      className="data-[state=open]:bg-accent rounded-sm"*/}
-            {/*    >*/}
-            {/*      <IconDots/>*/}
-            {/*      <span className="sr-only">More</span>*/}
-            {/*    </SidebarMenuAction>*/}
-            {/*  </DropdownMenuTrigger>*/}
-            {/*  <DropdownMenuContent*/}
-            {/*    className="w-24 rounded-lg"*/}
-            {/*    side={isMobile ? "bottom" : "right"}*/}
-            {/*    align={isMobile ? "end" : "start"}*/}
-            {/*  >*/}
-            {/*    <DropdownMenuItem>*/}
-            {/*      <IconFolder/>*/}
-            {/*      <span>Open</span>*/}
-            {/*    </DropdownMenuItem>*/}
-            {/*    <DropdownMenuItem>*/}
-            {/*      <IconShare3/>*/}
-            {/*      <span>Share</span>*/}
-            {/*    </DropdownMenuItem>*/}
-            {/*    <DropdownMenuSeparator/>*/}
-            {/*    <DropdownMenuItem variant="destructive">*/}
-            {/*      <IconTrash/>*/}
-            {/*      <span>Delete</span>*/}
-            {/*    </DropdownMenuItem>*/}
-            {/*  </DropdownMenuContent>*/}
-            {/*</DropdownMenu>*/}
+            <SidebarMenuButton
+              disabled={item.url === props.router.path || item.isComingSoon}
+              isActive={item.url === props.router.path}
+              onClick={() => props.router.navigate(item.url)}
+            >
+              <Icon item={item}/>
+              <span>{item.name}</span>
+              {item.isComingSoon && (
+                <Badge
+                  variant="outline"
+                >
+                  {"Coming Soon"}
+                </Badge>
+              )}
+            </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

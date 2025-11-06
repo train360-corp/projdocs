@@ -1,16 +1,16 @@
-"use client";
-import { createBrowserClient } from "@supabase/ssr";
+import { ReactNode, useEffect, useState } from "react";
+import { createClient } from "@workspace/supabase/client";
+import type { SupabaseClient } from "@workspace/supabase/types";
 
 
 
-export const createClient = (): SupabaseClient => {
-
-  const url = window.env.SUPABASE_PUBLIC_URL;
-  const anonKey = window.env.SUPABASE_PUBLIC_KEY;
-
-  if (!url || !anonKey) {
-    throw new Error("Supabase environment variables not found in window.env");
-  }
-
-  return createBrowserClient(url, anonKey, { auth: { storageKey: "train360-dms" } }) as unknown as SupabaseClient;
+export const WithSupabaseClient = (props: {
+  children: (supabase: SupabaseClient) => ReactNode
+}) => {
+  const [ supabase, setSupabase ] = useState<SupabaseClient | undefined>(undefined);
+  useEffect(() => {
+    setSupabase(createClient());
+  }, []);
+  if (supabase === undefined) return null;
+  return (props.children(supabase));
 };

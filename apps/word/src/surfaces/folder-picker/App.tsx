@@ -1,33 +1,26 @@
-import { ThemeProvider } from "@workspace/desktop/src/theme/theme-provider";
-import React, { CSSProperties } from "react";
-import { SidebarInset, SidebarProvider } from "@workspace/ui/components/sidebar";
-import { SiteHeader } from "@workspace/ui/components/site-header";
-import { AppSidebar } from "@workspace/word/components/sidebar";
-import { Routes } from "@workspace/word/surfaces/folder-picker/router/routes";
+import React, { useEffect, useState } from "react";
+import { MemoryRouter } from "react-router";
+import { Layout } from "@workspace/word/surfaces/folder-picker/src/layout";
+import { SupabaseRealtimeListener } from "@workspace/supabase/realtime/listener";
+import { v4 } from "uuid";
+import { createClient } from "@workspace/supabase/client";
 
 
 
-const App = () => (
-  <div className="fixed inset-0 flex flex-col font-sans antialiased bg-background overflow-hidden">
-    <ThemeProvider>
-      <SidebarProvider
-        style={{
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as CSSProperties}
-      >
-        <AppSidebar variant="inset"/>
-        <SidebarInset className="m-0 rounded-xl shadow-sm h-full overflow-hidden">
-          <div className="flex h-full flex-col">
-            <SiteHeader/>
-            <div className="flex flex-1 flex-col overflow-hidden min-h-0">
-              <Routes/>
-            </div>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </ThemeProvider>
-  </div>
-);
+export default function App() {
 
-export default App;
+  const [channel] = useState(v4());
+  const supabase = createClient();
+
+  useEffect(() => {
+    console.log(`realtime channel: ${channel}`);
+  }, [channel]);
+
+  return (
+    <SupabaseRealtimeListener supabase={supabase} channel={channel}>
+      <MemoryRouter initialEntries={[ "/dashboard" ]}>
+        <Layout/>
+      </MemoryRouter>
+    </SupabaseRealtimeListener>
+  );
+}

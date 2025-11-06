@@ -6,18 +6,13 @@
   "scripts": {
     "manifest:inject": "rm -rf ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/02BAD963-836A-4517-9CF2-300D4A81FF5C.manifest.xml && cp ./manifest/manifest-local.xml ~/Library/Containers/com.microsoft.Word/Data/Documents/wef/02BAD963-836A-4517-9CF2-300D4A81FF5C.manifest.xml",
     "manifest:validate": "office-addin-manifest validate ./manifest/manifest-local.xml",
-
     "predev": "npm run build:manifest:dev && npm run manifest:validate && npm run manifest:inject",
     "dev": "vite",
-
     "build": "npm run build:manifest:prod && tsc -b && vite build",
     "build:manifest:dev": "node manifest/generate.js dev",
     "build:manifest:prod": "node manifest/generate.js prod",
-
     "lint": "eslint .",
-
     "preview": "vite preview",
-
     "debugger:word:enable": "defaults write com.microsoft.Word OfficeWebAddinDeveloperExtras -bool true && defaults write com.microsoft.Word OfficeAddinDebuggerEnabled -bool true",
     "debugger:word:disable": "defaults delete com.microsoft.Word OfficeWebAddinDeveloperExtras && defaults delete com.microsoft.Word OfficeAddinDebuggerEnabled"
   },
@@ -29,7 +24,9 @@
     "cors": "^2.8.5",
     "http-proxy-middleware": "^3.0.5",
     "react": "^19.2.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-router": "^7.9.5",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -37,6 +34,7 @@
     "@types/office-js": "^1.0.550",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.6.0",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",

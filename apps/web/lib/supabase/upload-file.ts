@@ -1,7 +1,7 @@
 import * as tus from "tus-js-client";
 import { DetailedError, OnSuccessPayload } from "tus-js-client";
 import { v4 } from "uuid";
-import { Tables } from "@workspace/supabase/types";
+import { SupabaseClient, Tables } from "@workspace/supabase/types";
 
 
 type UploadableFile = {

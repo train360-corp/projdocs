@@ -4,14 +4,16 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "gen": "supabase gen types --local --lang=typescript --schema=public,storage > ./types.ts",
+    "gen": "supabase gen types --local --lang=typescript --schema=public,storage > ./types.gen.ts",
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-  },
-  "devDependencies": {
+    "@supabase/supabase-js": "^2.79.0"
   },
   "exports": {
     "./*": "./*"
+  },
+  "devDependencies": {
+    "react": "^19.2.0"
   }
 }

@@ -4,8 +4,10 @@ import { baseUrl } from "@workspace/word/lib/utils";
 
 export const saveAsNewFile: Action = async () => {
   console.log("✅ saveAsNewFile() was called");
-  Office.context.ui.displayDialogAsync(
-    `${baseUrl}/src/surfaces/folder-picker/index.html`,
+
+  const url = new URL(`${baseUrl}/src/surfaces/folder-picker/index.html`);
+
+  Office.context.ui.displayDialogAsync(url.toString(),
     { height: 75, width: 75 },              // size in % of window
     (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded) result.value.addEventHandler(Office.EventType.DialogMessageReceived, async (arg) => {

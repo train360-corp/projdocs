@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { H1 } from "@workspace/ui/components/text";
 import ClientsTable, { FavoriteClient } from "@workspace/ui/components/clients-table";
 import { useRouter } from "next/navigation";
-import { createClient } from "@workspace/web/lib/supabase/client";
+import { createClient } from "@workspace/supabase/client";
 import { Tables } from "@workspace/supabase/types";
 
-
+type FavoriteClientTable = Tables<"favorites"> & {
+  client: Tables<"clients">;
+}
 
 export default function Page() {
 
@@ -19,7 +21,7 @@ export default function Page() {
     createClient()
       .from("favorites")
       .select(`*, client:clients (*)`).not("client_id", "is", null)
-      .overrideTypes<Array<{ client: Tables<"clients"> }>>()
+      .overrideTypes<Array<FavoriteClientTable>>()
       .then(({ data }) => setClients(!data ? data : data.map(r => ({
         ...r.client,
         isFavorite: true

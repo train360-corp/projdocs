@@ -3,7 +3,6 @@
 import { TableCell, TableRow } from "@workspace/ui/components/table";
 import * as React from "react";
 import { columns } from "@workspace/ui/components/clients-table-columns";
-import { Tables } from "@workspace/supabase/types";
 import { BuildingIcon, FolderOpenIcon } from "lucide-react";
 import { IconDatabaseMinus, IconDatabasePlus, IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
@@ -17,8 +16,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { createClient } from "@workspace/web/lib/supabase/client";
 import { FavoriteClient } from "@workspace/ui/components/clients-table";
+import { createClient } from "@workspace/supabase/client";
 
 
 

@@ -1,9 +1,8 @@
-import * as React from "react";
 import { IconInnerShadowTop, } from "@tabler/icons-react";
 
 import { NavSection } from "@workspace/ui/components/nav-section";
 import { NavQuickCreate } from "@workspace/ui/components/nav-quick-create";
-import { NavUser } from "@workspace/web/components/nav-user";
+// import { NavUser } from "@workspace/web/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +13,19 @@ import {
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
 import { sections } from "@workspace/ui/components/nav-items";
+import { ComponentProps } from "react";
 
 
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = ComponentProps<typeof Sidebar> & {
+  router: {
+    path: string;
+    navigate: (url: string) => void;
+  }
+}
+
+
+export function AppSidebar({ router, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -36,14 +44,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavQuickCreate/>
+        {/*<NavQuickCreate/>*/}
         {sections.map((section, index) => (
-          <NavSection section={section} key={index}/>
+          <NavSection
+            router={router}
+            section={section}
+            key={index}
+          />
         ))}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto"/>*/}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser/>
+        {/*<NavUser/>*/}
       </SidebarFooter>
     </Sidebar>
   );

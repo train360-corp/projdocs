@@ -1,6 +1,6 @@
 import type { Server } from "http";
 import cors from "cors";
-import express, { NextFunction, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import { app } from "electron";
 import { Secrets } from "@workspace/desktop/electron/src/secrets";
 import https from "https";
@@ -15,7 +15,6 @@ const PORT = 9305 as const;
 let auth: AuthSettings | null = null;
 
 let server: Server | null = null;
-const isDev = !app.isPackaged;
 
 function buildApp() {
 
@@ -31,30 +30,6 @@ function buildApp() {
   // body parsers
   app.use(express.json({ limit: "32mb" })); // word internally sets this limit generally
   app.use(express.urlencoded({ extended: false }));
-
-  // minimal request logging in dev
-  if (isDev) {
-    app.use((req: Request, _res: Response, next: NextFunction) => {
-      console.log(`[http] ${req.method} ${req.url}`);
-      next();
-    });
-  }
-
-  app.use("/supabase", createProxyMiddleware({
-    changeOrigin: true,
-    ws: true,
-    secure: false,
-    pathRewrite: { "^/supabase": "" },
-    router: () => auth ? auth.supabase.url : undefined,
-    on: {
-      proxyReq: (proxyReq, req, res) => {
-        if (auth) {
-          proxyReq.setHeader("Authorization", `Bearer ${auth.token}`);
-          proxyReq.setHeader("apikey", auth.supabase.key);
-        }
-      },
-    },
-  }));
 
   // routes
   app.get("/healthz", (_req, res) => res.status(200).json({ ok: true }));
@@ -73,10 +48,59 @@ function buildApp() {
     else res.status(400).end();
   });
 
-  // 404
-  app.use((_req, res) => res.status(404).json({ error: "not found" }));
-
   return app;
+}
+
+function buildForwardProxy(server: Server, app: Express) {
+  const middleware = createProxyMiddleware({
+    changeOrigin: true,
+    ws: true,
+    secure: false,
+    pathRewrite: { "^/supabase": "" },
+    router: () => auth ? auth.supabase.url : undefined,
+    on: {
+      proxyReqWs: (proxyReq, req, socket, options, head) => {
+        try {
+
+          if (auth) {
+
+            if (proxyReq.path.startsWith("/realtime/v1/websocket")) {
+              const url = new URL(`http://placeholder.local${proxyReq.path}`);
+              url.searchParams.set("apikey", auth.supabase.key);
+              proxyReq.path = url.pathname + "?" + url.searchParams.toString();
+            }
+
+            proxyReq.setHeader("Authorization", `Bearer ${auth.token}`);
+            proxyReq.setHeader("apikey", auth.supabase.key);
+
+          }
+        } catch (e) {
+          console.error(e);
+          socket.destroy(e as Error);
+        }
+      },
+      proxyReq: (proxyReq, req, res) => {
+        if (auth) {
+          proxyReq.setHeader("Authorization", `Bearer ${auth.token}`);
+          proxyReq.setHeader("apikey", auth.supabase.key);
+        }
+      },
+    },
+  });
+  app.use("/supabase", middleware);
+  server.on("upgrade", (req, socket, head) => {
+    try {
+      if (req.url?.startsWith("/supabase/realtime/v1/websocket")) {
+        // @ts-expect-error: Node typings use Socket, but proxy expects Duplex
+        middleware.upgrade(req, socket, head);
+      } else {
+        socket.destroy();
+      }
+    } catch (err) {
+      console.error("[upgrade] proxy error:", err);
+      socket.destroy();
+    }
+  });
 }
 
 async function startHttpServer(): Promise<void> {
@@ -87,6 +111,12 @@ async function startHttpServer(): Promise<void> {
 
   const { key, cert } = trustRootCert();
   server = https.createServer({ key, cert }, app);
+
+  // setup
+  buildForwardProxy(server, app);
+
+  // add minimal 404 **LAST**
+  app.use((_req, res) => res.status(404).json({ error: "not found" }));
 
   await new Promise<void>((resolve, reject) => {
     server!.once("error", (err: any) => {
@@ -143,7 +173,7 @@ export const HttpServer = {
   stop: stopHttpServer,
   auth: {
     set: (a: AuthSettings | null) => {
-      auth = a
+      auth = a;
     }
   }
 };

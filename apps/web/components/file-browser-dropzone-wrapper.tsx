@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { uploadFile } from "@workspace/web/lib/supabase/upload-file";
-import { createClient } from "@workspace/web/lib/supabase/client";
+import { createClient } from "@workspace/supabase/client";
 import { toast } from "sonner";
 import { Tables } from "@workspace/supabase/types";
 import { DropzoneWrapper } from "@workspace/ui/components/dropzone-wrapper";

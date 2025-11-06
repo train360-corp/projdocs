@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@workspace/web/lib/supabase/client";
+import { createClient } from "@workspace/supabase/client";
 import { FileViewers } from "@workspace/web/components/file-viewer/viewers";
 import { Card } from "@workspace/ui/components/card";
 import { NIL } from "uuid";

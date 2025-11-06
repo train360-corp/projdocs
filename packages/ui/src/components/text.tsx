@@ -129,3 +129,39 @@ export const InlineCode = React.forwardRef<
   </code>
 ));
 InlineCode.displayName = "InlineCode";
+
+export interface LinkProps
+  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+}
+
+export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
+  ({ className, children, href, onClick, ...props }, ref) => {
+    const handleClick = React.useCallback(
+      (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (onClick) {
+          e.preventDefault(); // so you can handle navigation manually
+          onClick(e);
+        }
+      },
+      [onClick]
+    );
+
+    return (
+      <a
+        ref={ref}
+        href={href}
+        onClick={onClick ? handleClick : undefined}
+        className={cn(
+          "font-medium underline underline-offset-4 transition-colors text-primary hover:text-primary/80",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
+);
+
+Link.displayName = "Link";

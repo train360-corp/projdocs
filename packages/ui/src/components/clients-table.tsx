@@ -10,7 +10,7 @@ import { IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
 
 export type FavoriteClient = Tables<"clients"> & {
-  isFavorite?: Tables<"clients">
+  isFavorite?: boolean;
 };
 
 export default function ClientsTable({ clients, noRowsText, onRowClick }: {

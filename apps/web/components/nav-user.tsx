@@ -12,9 +12,10 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@workspace/ui/components/sidebar";
 import { Tables } from "@workspace/supabase/types";
-import { createClient } from "@workspace/web/lib/supabase/server";
+import { createClient } from "@workspace/supabase/client";
 import { User } from "@supabase/auth-js";
 import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 
@@ -22,18 +23,26 @@ type CurrentUser = Tables<"users"> & {
   auth: User
 };
 
-export async function NavUser() {
+export function NavUser() {
 
-  const supabase = await createClient();
+  const [user, setUser] = useState<CurrentUser | undefined>();
 
-  const { data: { user: auth } } = await supabase.auth.getUser();
-  const { data: $public } = await supabase.from("users").select().eq("id", auth?.id ?? "").single();
-  if (auth === null || $public === null) redirect("/auth/login");
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      await supabase.auth.refreshSession();
 
-  const user: CurrentUser = {
-    auth,
-    ...$public,
-  };
+      const { data: { user: auth }, error } = await supabase.auth.getUser();
+      console.log(user, error);
+
+      const { data: $public } = await supabase.from("users").select().eq("id", auth?.id ?? "").single();
+      if (auth && $public) setUser({
+        auth,
+        ...$public,
+      });
+
+    })();
+  }, []);
 
   return (
     <SidebarMenu>

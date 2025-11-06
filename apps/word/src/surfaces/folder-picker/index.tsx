@@ -1,46 +1,36 @@
+import "./index.css";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import "./index.css";
+import { CONSTANTS } from "@workspace/word/lib/consts";
+import { SupabaseBrowserRuntimeEnvironment } from "@workspace/supabase/types";
 
 declare global {
-  interface Window { Office?: typeof Office; }
+  interface Window {
+    Office?: typeof Office;
+    env?: SupabaseBrowserRuntimeEnvironment;
+  }
 }
 
-function domReady(): Promise<void> {
-  return new Promise((res) => {
+Office.onReady(async () => {
+
+  // wait for DOM to be ready
+  await new Promise<void>((res) => {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", () => res(), { once: true });
     } else res();
   });
-}
 
-function officeReady(): Promise<void> {
-  return new Promise((res) => {
-    // If not running inside Office, just resolve so dev works in browser.
-    if (!window.Office) return res();
-
-    // Preferred
-    if (typeof Office.onReady === "function") {
-      Office.onReady().then(() => res()).catch(() => res()); // be permissive for HMR
-      return;
-    }
-
-    // Older hosts fallback
-    (Office as any).initialize = () => res();
-  });
-}
-
-async function boot() {
-  await domReady();
-  await officeReady();
+  // inject custom envs
+  window.env = {
+    SUPABASE_PUBLIC_URL: `${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/supabase`,
+    SUPABASE_PUBLIC_KEY: "handled-by-desktop-forward-proxy",
+  };
 
   const rootEl = document.getElementById("root");
   if (!rootEl) throw new Error("#root not found");
+  createRoot(rootEl).render(<App/>);
 
-  createRoot(rootEl).render(<App />);
-}
-
-boot().catch((e) => {
+}).catch((e) => {
   console.error("Boot error:", e);
 });

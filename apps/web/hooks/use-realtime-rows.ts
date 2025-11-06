@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Database } from "@workspace/supabase/types";
-import { createClient } from "@workspace/web/lib/supabase/client";
+import { createClient } from "@workspace/supabase/client";
 import { RealtimeChannel } from "@supabase/realtime-js";
 import { v4 } from "uuid";
 

@@ -1,35 +1,49 @@
-import { Tables } from "@workspace/supabase/types";
-import { createClient } from "@workspace/web/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { FileBrowserDropzoneWrapper } from "@workspace/web/components/file-browser-dropzone-wrapper";
+import { SupabaseClient, Tables } from "@workspace/supabase/types";
 import FileBrowserTable from "@workspace/web/components/file-browser-table";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { Spinner } from "@workspace/ui/components/spinner";
 
 
 
-export const FileBrowser = async ({ client, project, directoryID }: {
+export const FileBrowser = ({ client, project, directoryID, supabase, navigate }: {
   client: Tables<"clients">;
   project: Tables<"projects">;
-  directoryID: string;
+  directoryID?: string;
+  supabase: SupabaseClient;
+  navigate: (url: string) => void;
 }) => {
 
-  const supabase = await createClient();
-  const isRootPath = directoryID === "_";
 
-  const directory = isRootPath ? null : await supabase.from("directories").select().eq("project_id", project.id).eq("id", directoryID).single();
+  const [ directory, setDirectory ] = useState<Tables<"directories"> | null | undefined>(undefined);
 
-  if (directory?.error) redirect(`/dashboard/clients/${client.id}/${project.id}`);
+  useEffect(() => {
+    const isRootPath = directoryID === "_" || directoryID === undefined;
+    if (isRootPath) setDirectory(null);
+    else supabase.from("directories").select()
+      .eq("project_id", project.id)
+      .eq("id", directoryID)
+      .single()
+      .then(({ data, error }) => {
+        if (error) console.error(error);
+        setDirectory(data);
+      });
+  }, [ directoryID ]);
 
   return (
     <div className="flex flex-col rounded-lg border h-full max-h-full overflow-scroll">
-      <FileBrowserDropzoneWrapper
-        project={project}
-        directory={directory?.data ?? null}
-      >
+      {directory === undefined ? (
+        <div className={"flex flex-row w-full justify-center"}>
+          <Spinner className={"size-16 text-secondary"}/>
+        </div>
+      ) : (
         <FileBrowserTable
           project={project}
-          directory={directory?.data ?? null}
+          directory={directory}
+          supabase={supabase}
+          navigate={navigate}
         />
-      </FileBrowserDropzoneWrapper>
+      )}
     </div>
   );
 };
