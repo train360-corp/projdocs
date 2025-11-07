@@ -9,6 +9,9 @@ declare global {
   }
 }
 
+export const createClientImpl = (url: string, anonKey: string, accessToken?: () => Promise<string | null>): SupabaseClient =>
+  createBrowserClient(url, anonKey, { auth: { storageKey: "train360-dms" }, accessToken }) as unknown as SupabaseClient
+
 export const createClient = (): SupabaseClient => {
 
   if (window === undefined) throw new Error("window is undefined");
@@ -20,5 +23,5 @@ export const createClient = (): SupabaseClient => {
   const anonKey = window.env.SUPABASE_PUBLIC_KEY;
   if (!anonKey) throw new Error("window.env.SUPABASE_PUBLIC_KEY is undefined");
 
-  return createBrowserClient(url, anonKey, { auth: { storageKey: "train360-dms" } }) as unknown as SupabaseClient;
+  return createClientImpl(url, anonKey);
 };

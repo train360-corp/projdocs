@@ -25,7 +25,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@workspace/word": path.resolve(__dirname, "src"),
-      // adjust path based on your actual monorepo layout
     },
   },
   build: {

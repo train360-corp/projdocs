@@ -21,6 +21,7 @@
     "incremental": false,
     "plugins": [],
     "paths": {
+      "@workspace/supabase/*": ["../../packages/supabase/*"],
       "@workspace/desktop/*": ["./*"],
       "@workspace/packages/consts/*": ["../../packages/consts/src/*"]
     },

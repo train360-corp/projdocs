@@ -7,6 +7,10 @@ import https from "https";
 import { trustRootCert } from "@workspace/desktop/electron/src/certs";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
+import path from "node:path";
+import fs from "fs";
+import { createClientImpl } from "../../../../packages/supabase/client";
+import { Tables } from "../../../../packages/supabase/types.gen";
 
 
 
@@ -15,6 +19,22 @@ const PORT = 9305 as const;
 let auth: AuthSettings | null = null;
 
 let server: Server | null = null;
+
+const makeFolder = (...segments: string[]) => {
+
+  const home = app.getPath("home"); // /Users/username or C:\Users\username
+  const baseDir = path.join(home, ".projdocs");
+  fs.mkdirSync(baseDir, { recursive: true });
+
+  // Append any extra segments (e.g., downloads, cache, userId)
+  const finalPath = path.join(baseDir, ...segments);
+
+  // Ensure that directory exists if it ends with a folder
+  const dir = path.extname(finalPath) ? path.dirname(finalPath) : finalPath;
+  fs.mkdirSync(dir, { recursive: true });
+
+  return finalPath;
+};
 
 function buildApp() {
 
@@ -35,6 +55,35 @@ function buildApp() {
     version: appVersion(),
     electron: process.versions.electron
   }));
+
+  app.get("/checkout", async (req, res) => {
+
+    const fileID = req.query["file-id"];
+    if (!fileID) return res.status(400).json({ error: "`file-id` query parameter is required" });
+    if (typeof fileID !== "string") return res.status(400).json({ error: "`file-id` query parameter must be a string" });
+    if (!auth) return res.status(500).json({ error: "unable to access authentication" });
+    const supabase = createClientImpl(auth.supabase.url, auth.supabase.key, async () => auth?.token ?? null);
+
+    // get current user
+    const uid = await supabase.rpc("get_user_id");
+    if (uid.error || !uid.data) return res.status(500).json({ error: "unable to retrieve user-id" });
+
+    // get file row
+    const file = await supabase.from("files").update({ locked_by_user_id: uid.data, }).eq("id", fileID).select("*, version:current_version_id (*)").single().overrideTypes<Tables<"files"> & {
+      version: Tables<"files_versions"> | null
+    }>();
+    if (file.error) return res.status(500).json({ error: "unable to checkout file", detail: file.error });
+    if (file.data.version === null) return res.status(400).json({ error: "file does not have a current version" });
+
+    // download file
+    const download = await supabase.storage.from(file.data.project_id).download(file.data.version.name);
+    if (download.error) return res.status(500).json({ error: "unable to download file", detail: download.error });
+    const buffer = Buffer.from(await download.data.arrayBuffer());
+    const filePath = path.join(makeFolder("files"), file.data.version.name);
+    fs.writeFileSync(filePath, buffer);
+
+    res.status(201).json({ success: true, path: filePath });
+  });
 
   app.post("/echo", (req, res) => res.status(200).json({ received: req.body ?? null }));
 

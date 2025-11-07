@@ -1,11 +1,10 @@
 import { baseUrl, saveSettings } from "@workspace/word/lib/utils";
 import { Tables } from "@workspace/supabase/types.gen";
 import { createClient } from "@workspace/supabase/client";
-import { uploadFile } from "@workspace/web/lib/supabase/upload-file";
-import { v4 } from "uuid";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import { launch } from "@workspace/word/lib/actions/launch";
+import CloseBehavior = Word.CloseBehavior;
 
 
 
@@ -43,16 +42,6 @@ export const saveAsNewFile: Action = async () => {
 
               result.value.close();
 
-              const file = await new Promise<Office.File>((resolve, reject) => {
-                Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
-                  if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
-                  else reject(res.error || new Error("getFileAsync failed"));
-                });
-              });
-              const bytes = await readAllSlices(file);
-              const docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
-
-
               const supabase = createClient();
               const uid = await supabase.rpc("get_user_id")
               if(uid.error || !uid.data) {
@@ -77,10 +66,41 @@ export const saveAsNewFile: Action = async () => {
                 return
               }
 
+              Office.context.document.settings.set(CONSTANTS.SETTINGS.FILE_REF, fileRow.data.number);
+              Office.context.document.settings.set(CONSTANTS.SETTINGS.VERSION_REF, 1);
+              await saveSettings();
+
+              let docxBlob;
+              try {
+                const file = await new Promise<Office.File>((resolve, reject) => {
+                  Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
+                    if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
+                    else reject(res.error || new Error("getFileAsync failed"));
+                  });
+                });
+                const bytes = await readAllSlices(file);
+                docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
+              } catch (e) {
+                console.error(e);
+                Office.context.document.settings.remove(CONSTANTS.SETTINGS.FILE_REF);
+                Office.context.document.settings.remove(CONSTANTS.SETTINGS.VERSION_REF);
+                await saveSettings();
+                await displayDialog({
+                  title: "Unable to Save",
+                  description: "An error occurred while saving file",
+                });
+                return;
+              }
+
+              // remove from THIS document (already in the blob/static document)
+              Office.context.document.settings.remove(CONSTANTS.SETTINGS.FILE_REF);
+              Office.context.document.settings.remove(CONSTANTS.SETTINGS.VERSION_REF);
+              await saveSettings();
+
               const filename = `${fileRow.data.number}-1.docx`
               const res = await supabase.storage.from(msg.body.directory.project_id).upload(filename, docxBlob, {
                 metadata: {
-                  file_id: null,
+                  file_id: fileRow.data.id,
                   directory_id: msg.body.directory.id,
                   filename: filename,
                 }
@@ -95,11 +115,43 @@ export const saveAsNewFile: Action = async () => {
                 return;
               }
 
-              Office.context.document.settings.set(CONSTANTS.SETTINGS.FILE_REF, fileRow.data.number);
-              Office.context.document.settings.set(CONSTANTS.SETTINGS.VERSION_REF, 1);
-              await saveSettings();
+              // checkout the file
+              const checkout = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/checkout?file-id=${fileRow.data.id}`);
+              if(checkout.status !== 201) {
+                await displayDialog({
+                  title: "Unable to Checkout File",
+                  description: `File saved successfully, but an error occurred while opening it (${status})`,
+                  onClose: async () => await Word.run(async (context) => {
+                    context.document.close(CloseBehavior.skipSave);
+                    await context.sync();
+                  })
+                });
+                return;
+              }
 
-              await launch(); // reload the doc
+              try {
+                const { path } = await checkout.json();
+
+                // save and re-open
+                await Word.run(async (context) => {
+                  context.application.openDocument(path);
+                  await context.sync();
+                  context.document.close(CloseBehavior.skipSave);
+                  await context.sync();
+                });
+
+              } catch (e) {
+                console.error(e);
+                await displayDialog({
+                  title: "Unable to Checkout File",
+                  description: "File saved successfully, but an error occurred while opening it",
+                  onClose: async () => await Word.run(async (context) => {
+                    context.document.close(CloseBehavior.skipSave);
+                    await context.sync();
+                  })
+                });
+                return;
+              }
 
               return;
 
