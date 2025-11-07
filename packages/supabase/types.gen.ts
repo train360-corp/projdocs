@@ -388,6 +388,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_user_id: { Args: never; Returns: string }
     }
     Enums: {
       access: "READ" | "EDIT" | "DELETE" | "ADMIN" | "NONE"

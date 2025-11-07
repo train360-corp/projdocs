@@ -54,9 +54,19 @@ export const saveAsNewFile: Action = async () => {
 
 
               const supabase = createClient();
+              const uid = await supabase.rpc("get_user_id")
+              if(uid.error || !uid.data) {
+                await displayDialog({
+                  title: "Unable to Save",
+                  description: "An error occurred while saving file",
+                });
+                console.error(uid.error ?? "no session returned");
+                return
+              }
 
               const fileRow = await supabase.from("files").insert({
                 project_id: msg.body.directory.project_id,
+                locked_by_user_id: uid.data,
               }).select().single();
               if(fileRow.error) {
                 await displayDialog({
