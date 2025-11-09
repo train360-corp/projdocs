@@ -3,8 +3,7 @@ import { saveAsNewVersion } from "@workspace/word/lib/actions/save-as-new-versio
 import { launch } from "@workspace/word/lib/actions/launch";
 import { saveAsNewFile } from "@workspace/word/lib/actions/save-as-new-document";
 import { CONSTANTS } from "@workspace/word/lib/consts";
-
-
+import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
 
 export const Actions = {
   save,
@@ -12,6 +11,10 @@ export const Actions = {
   launch,
   saveAsNewFile,
   insertDocumentNumber: async () => await Word.run(async (context) => {
+
+    // refresh existing ids
+    await refreshFileIdContentControls();
+
     const fileRef = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
     const verRef = Office.context.document.settings.get(CONSTANTS.SETTINGS.VERSION_REF);
     if (!fileRef) {
@@ -26,7 +29,7 @@ export const Actions = {
     range.clear();
     const cc = range.insertContentControl();
     cc.title = "ProjDocs File Reference";
-    cc.tag = "projdocs_file_ref";
+    cc.tag = CONSTANTS.CONTENT_CONTROLS.FILE_ID.TAG;
     cc.insertText(`${fileRef}.${verRef}`, "Replace");
     cc.appearance = "BoundingBox";
     cc.cannotEdit = true;

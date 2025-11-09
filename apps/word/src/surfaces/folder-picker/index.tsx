@@ -9,6 +9,7 @@ declare global {
   interface Window {
     Office?: typeof Office;
     env?: SupabaseBrowserRuntimeEnvironment;
+    filename?: string;
   }
 }
 
@@ -20,6 +21,9 @@ Office.onReady(async () => {
       document.addEventListener("DOMContentLoaded", () => res(), { once: true });
     } else res();
   });
+
+  const url = new URL(window.location.toString());
+  window.filename = url.searchParams.get("filename") ?? undefined;
 
   // inject custom envs
   window.env = {

@@ -23,15 +23,11 @@ export enum FileBrowserEventTypes {
 export type FileBrowserEventPayload<T extends FileBrowserEventTypes> = T extends FileBrowserEventTypes.DIRECTORY_SELECTED ? {
   type: FileBrowserEventTypes.DIRECTORY_SELECTED;
   directory: Tables<"directories">;
-  file: null;
 } : T extends FileBrowserEventTypes.FILE_SELECTED ? {
   type: FileBrowserEventTypes.FILE_SELECTED;
-  directory: null;
   file: Tables<"symlinks">;
 } : {
   type: FileBrowserEventTypes.UNKNOWN;
-  directory: null;
-  file: null;
 }
 
 export const useFileBrowserEvent = <T extends FileBrowserEventTypes>(event: T, handler: (payload: FileBrowserEventPayload<T>) => void) => {
@@ -284,7 +280,6 @@ const WithOrWithoutSymlinks = ({
                   setSelectedRowId(directory.id);
                   dispatch(FileBrowserEventTypes.DIRECTORY_SELECTED, {
                     directory: directory,
-                    file: null
                   });
                 }}
               />
@@ -300,7 +295,6 @@ const WithOrWithoutSymlinks = ({
                 onRowSelect={disableFileSelection ? undefined : () => {
                   setSelectedRowId(symlink.id);
                   dispatch(FileBrowserEventTypes.FILE_SELECTED, {
-                    directory: null,
                     file: symlink,
                   })
                 }}

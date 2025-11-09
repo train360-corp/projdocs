@@ -11,6 +11,8 @@ import path from "node:path";
 import fs from "fs";
 import { createClientImpl } from "../../../../packages/supabase/client";
 import { Tables } from "../../../../packages/supabase/types.gen";
+import { exec } from "node:child_process";
+import os from "os";
 
 
 
@@ -75,12 +77,23 @@ function buildApp() {
     if (file.error) return res.status(500).json({ error: "unable to checkout file", detail: file.error });
     if (file.data.version === null) return res.status(400).json({ error: "file does not have a current version" });
 
+    // get the object
+    const object = await supabase.rpc("get_storage_object_by_id", { object_id: file.data.version.object_id });
+    if(object.error || object.data === null) return res.status(500).json({ error: "unable to checkout file", detail: object.error ?? "no object found" });
+    if(object.data.path_tokens === null) return res.status(500).json({ error: "unable to checkout file", detail: "no path tokens on object" });
+
     // download file
-    const download = await supabase.storage.from(file.data.project_id).download(file.data.version.name);
+    const download = await supabase.storage.from(file.data.project_id).download(object.data.path_tokens.join("/"));
     if (download.error) return res.status(500).json({ error: "unable to download file", detail: download.error });
     const buffer = Buffer.from(await download.data.arrayBuffer());
-    const filePath = path.join(makeFolder("files"), file.data.version.name);
+    const filePath = path.join(makeFolder("files", file.data.project_id, file.data.version.id), `${!!file.data.version.name ? (file.data.version.name.toLowerCase().endsWith(".docx") ? file.data.version.name.substring(0, file.data.version.name.length-(".docx").length) : file.data.version.name) + "-" : ""}${file.data.number}.${file.data.version.version}.docx`);
     fs.writeFileSync(filePath, buffer);
+
+    try {
+      await fixPerms(filePath);
+    } catch (error) {
+      console.error(error);
+    }
 
     res.status(201).json({ success: true, path: filePath });
   });
@@ -222,3 +235,17 @@ export const HttpServer = {
     }
   }
 };
+
+const fixPerms = (filePath: string) => new Promise<void>((res, rej) => {
+  if(os.platform() !== "darwin") return;
+  exec(`xattr -d com.apple.provenance "${filePath}"`, (error, stdout, stderr) => {
+    if (error) return rej(`exec error: ${error}`);
+    if (stderr) return rej(`stderr: ${stderr}`);
+    res();
+  });
+  exec(`xattr -d com.apple.quarantine "${filePath}"`, (error, stdout, stderr) => {
+    if (error) return rej(`exec error: ${error}`);
+    if (stderr) return rej(`stderr: ${stderr}`);
+    res();
+  });
+})

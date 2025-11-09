@@ -24,8 +24,8 @@ export const Toolbar = () => {
             onMouseLeave={() => setUrlHovered(false)}
             onClick={() => window.app.open(auth.state.settings!.url)}
             className={cn(
-              "text-xs pl-2 cursor-pointer",
-              urlHovered ? "text-primary" : "text-muted"
+              "text-xs pl-2 cursor-pointer transition-colors",
+              urlHovered ? "text-primary" : "text-muted-foreground"
             )}
           >
             {auth.state.settings.url}
@@ -41,11 +41,11 @@ export const Toolbar = () => {
               size={"sm"}
               onClick={async () => await window.app.quit()}
             >
-              <OctagonX className={quitButtonHovered ? "text-primary" : "text-secondary"} size={5}/>
+              <OctagonX className={cn("transition-colors", quitButtonHovered ? "text-primary" : "text-muted-foreground")} size={5}/>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{"Quit ProjDocs"}</p>
+            <p>{"Quit ProjDocs Desktop"}</p>
           </TooltipContent>
         </Tooltip>
       </div>

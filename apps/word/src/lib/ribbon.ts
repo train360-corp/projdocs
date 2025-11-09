@@ -3,18 +3,17 @@ import { CONSTANTS } from "@workspace/word/lib/consts";
 
 
 
-type EventHandler = (event: Office.AddinCommands.Event) => Promise<void>;
-
-
-const safely = (action: Action): EventHandler => async (event) => {
-  try {
-    await action();
-  } catch (e) {
-    console.error(e);
-  } finally {
-    event.completed();
+const safely = (action: () => Promise<void>) => (
+  async (event: Office.AddinCommands.Event) => {
+    try {
+      await action();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      event.completed();
+    }
   }
-};
+);
 
 export const Ribbon = {
   setup: async () => {
