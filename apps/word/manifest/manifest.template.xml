@@ -56,33 +56,35 @@
 
             <CustomTab id="__TAB_ID__">
 
-<!--              <Group id="__GROUP_A_ID__">-->
-<!--                <Label resid="__GROUP_A_ID__.Label"/>-->
-<!--                <Icon>-->
-<!--                  <bt:Image size="16" resid="Icon.16x16"/>-->
-<!--                  <bt:Image size="32" resid="Icon.32x32"/>-->
-<!--                  <bt:Image size="80" resid="Icon.80x80"/>-->
-<!--                </Icon>-->
-<!--                <Control xsi:type="Button" id="__LAUNCH_BUTTON_ID__">-->
-<!--                  <Label resid="__LAUNCH_BUTTON_ID__.Label"/>-->
-<!--                  <Supertip>-->
-<!--                    <Title resid="__LAUNCH_BUTTON_ID__.Label"/>-->
-<!--                    <Description resid="__LAUNCH_BUTTON_ID__.Tooltip"/>-->
-<!--                  </Supertip>-->
-<!--                  <Icon>-->
-<!--                    <bt:Image size="16" resid="Icon.16x16"/>-->
-<!--                    <bt:Image size="32" resid="Icon.32x32"/>-->
-<!--                    <bt:Image size="80" resid="Icon.80x80"/>-->
-<!--                  </Icon>-->
-<!--                  <Action xsi:type="ExecuteFunction">-->
-<!--                    <FunctionName>__LAUNCH_FUNC_ID__</FunctionName>-->
-<!--                  </Action>-->
-<!--                </Control>-->
-<!--              </Group>-->
+              <Group id="__GROUP_A_ID__">
+                <Label resid="__GROUP_A_ID__.L"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                <Control xsi:type="Button" id="__RETURN_DOC_BTN_ID__">
+                  <Label resid="__GROUP_A_ID__.__RETURN_DOC_BTN_ID__.L"/>
+                  <Supertip>
+                    <Title resid="__GROUP_A_ID__.__RETURN_DOC_BTN_ID__.L"/>
+                    <Description resid="__GROUP_A_ID__.__RETURN_DOC_BTN_ID__.D"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.CheckIn.16x16"/>
+                    <bt:Image size="32" resid="Icon.CheckIn.32x32"/>
+                    <bt:Image size="80" resid="Icon.CheckIn.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>__RETURN_DOC_FUNC_ID__</FunctionName>
+                  </Action>
+                  <Enabled>false</Enabled>
+                </Control>
+
+              </Group>
 
               <!-- MAIN COMMAND GROUP -->
               <Group id="__GROUP_B_ID__">
-                <Label resid="__GROUP_B_ID__.Label"/>
+                <Label resid="__GROUP_B_ID__.L"/>
                 <Icon>
                   <bt:Image size="16" resid="Icon.16x16"/>
                   <bt:Image size="32" resid="Icon.32x32"/>
@@ -181,6 +183,10 @@
         <bt:Image id="Icon.32x32" DefaultValue="__DOMAIN__/icons/32-icon.png"/>
         <bt:Image id="Icon.80x80" DefaultValue="__DOMAIN__/icons/80-icon.png"/>
 
+        <bt:Image id="Icon.CheckIn.16x16" DefaultValue="__DOMAIN__/icons/check-in-16.png"/>
+        <bt:Image id="Icon.CheckIn.32x32" DefaultValue="__DOMAIN__/icons/check-in-32.png"/>
+        <bt:Image id="Icon.CheckIn.80x80" DefaultValue="__DOMAIN__/icons/check-in-80.png"/>
+
         <!-- Button 1: Save -->
         <bt:Image id="Icon.Save.16x16" DefaultValue="__DOMAIN__/icons/save-16.png"/>
         <bt:Image id="Icon.Save.32x32" DefaultValue="__DOMAIN__/icons/save-32.png"/>
@@ -211,10 +217,10 @@
         <bt:String id="GetStarted.Title" DefaultValue="ProjDocs loaded successfully!"/>
         <bt:String id="__TAB_ID__.Label" DefaultValue="ProjDocs"/>
 
-        <bt:String id="__GROUP_A_ID__.Label" DefaultValue="Setup"/>
-        <bt:String id="__LAUNCH_BUTTON_ID__.Label" DefaultValue="Launch ProjDocs"/>
+        <bt:String id="__GROUP_A_ID__.L" DefaultValue="Actions"/>
+        <bt:String id="__GROUP_A_ID__.__RETURN_DOC_BTN_ID__.L" DefaultValue="Check-In Document"/>
 
-        <bt:String id="__GROUP_B_ID__.Label" DefaultValue="Commands Group"/>
+        <bt:String id="__GROUP_B_ID__.L" DefaultValue="Save"/>
         <bt:String id="__SAVE_BUTTON_ID__.Label" DefaultValue="Save Version"/>
         <bt:String id="__SAVE_NEW_VERSION_BUTTON_ID__.Label" DefaultValue="Save as New Version"/>
         <bt:String id="__SAVE_NEW_DOC_BUTTON_ID__.Label" DefaultValue="Save as New Document"/>
@@ -224,15 +230,14 @@
 
       </bt:ShortStrings>
       <bt:LongStrings>
+
         <bt:String
             id="GetStarted.Description"
             DefaultValue="The ProjDocs add-in loaded successfully. Go to the HOME tab to continue."
         />
 
-        <bt:String
-            id="__LAUNCH_BUTTON_ID__.Tooltip"
-            DefaultValue="Start ProjDocs in this document and enable autoload on open."
-        />
+        <bt:String id="__GROUP_A_ID__.__RETURN_DOC_BTN_ID__.D" DefaultValue="Return the document and allow others to edit."/>
+
 
         <!-- Button 1: Save-->
         <bt:String

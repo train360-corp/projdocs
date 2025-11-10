@@ -1,10 +1,40 @@
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import { saveSettings, setButtons } from "@workspace/word/lib/utils";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
+import CloseBehavior = Word.CloseBehavior;
 
 
 
-export const launch: Action = async () => {
+export const statusCheck = async (): Promise<Status> => {
+  const status: Status = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`)
+    .then(async (resp) => ({
+      connector: {
+        running: true,
+        loggedIn: resp.status === 200,
+      }
+    }) satisfies Status).catch(() => ({ connector: { running: false, loggedIn: false } } satisfies Status));
+  if (!status.connector.running) {
+    if(!await displayDialog.Async({
+      title: "Unable to Connect to ProjDocs Connector",
+      description: "Is the connector running on your device?"
+    })) await Word.run(async (context) => {
+      context.document.close(CloseBehavior.save);
+      await context.sync();
+    })
+  }
+  else if (!status.connector.loggedIn) {
+    if(!await displayDialog.Async({
+      title: "Not Logged In",
+      description: "The ProjDocs Connector is running on your device, but is not logged in.",
+    })) await Word.run(async (context) => {
+      context.document.close(CloseBehavior.save);
+      await context.sync();
+    });
+  }
+  return status;
+};
+
+export const launch = async () => {
 
   if (await Office.addin.getStartupBehavior() !== Office.StartupBehavior.load) {
     await Office.addin.setStartupBehavior(Office.StartupBehavior.load);
@@ -15,21 +45,9 @@ export const launch: Action = async () => {
   // wait for ribbon to initialize
   await waitForRibbon();
 
-  // always disable everything briefly while we determine state (prevents flicker)
-  await setButtons([
-    // [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
-    [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
-      { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
-      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
-      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: false }
-    ] ],
-    [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
-  ]);
-
   const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
-
   if (typeof documentID === "number" && documentID > 0) await setButtons([
-    // [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
+    [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.CHECK_IN.ID, enabled: true } ] ],
     [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
       { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: true },
       { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: true },
@@ -38,7 +56,6 @@ export const launch: Action = async () => {
     [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: true } ] ]
   ]);
   else await setButtons([
-    // [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
     [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
       { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
       { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
@@ -47,27 +64,7 @@ export const launch: Action = async () => {
     [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
   ]);
 
-  const status: Status = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`)
-    .then(async (resp) => ({
-      connector: {
-        running: true,
-        loggedIn: resp.status === 200,
-      }
-    }) satisfies Status).catch(() => ({ connector: { running: false, loggedIn: false } } satisfies Status));
-
-  if (!status.connector.running) {
-    await displayDialog({
-      title: "Unable to Connect to ProjDocs Connector",
-      description: "Is the connector running on your device?"
-    });
-  } else if (!status.connector.loggedIn) {
-    await displayDialog({
-      title: "Not Logged In",
-      description: "The ProjDocs Connector is running on your device, but is not logged in.",
-    });
-  }
-
-
+  await statusCheck();
 };
 
 type Status = {

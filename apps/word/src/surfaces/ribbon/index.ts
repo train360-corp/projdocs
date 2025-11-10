@@ -1,4 +1,4 @@
-import { Ribbon } from "@workspace/word/lib/ribbon";
+import { Ribbon } from "@workspace/word/surfaces/ribbon/actions";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 
 // inject custom envs

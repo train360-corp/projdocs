@@ -1,20 +1,18 @@
 import { CONSTANTS } from "@workspace/word/lib/consts";
-import { FileBlob, getFileBlob, saveSettings, setButtons } from "@workspace/word/lib/utils";
+import { FileBlob, getFileBlob, saveSettings } from "@workspace/word/lib/utils";
 import { createClient } from "@workspace/supabase/client";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import { Tables } from "@workspace/supabase/types.gen";
 import SaveBehavior = Word.SaveBehavior;
 
-
-
-export const save: Action = async () => {
+export const _save = async (): Promise<boolean> => {
 
   // save file locally
   await Word.run(async (context) => {
     context.document.save(SaveBehavior.save);
     await context.sync();
-  })
+  });
 
   const supabase = createClient();
 
@@ -31,11 +29,11 @@ export const save: Action = async () => {
   const fileRef: number | unknown = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
   if (!fileRef || typeof fileRef !== "number") {
     console.error("fileRef is falsey");
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "An error occurred while saving file",
     });
-    return;
+    return false;
   }
 
   // load the file
@@ -44,37 +42,37 @@ export const save: Action = async () => {
   }>();
   if (file.error) {
     console.error(file.error);
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "An error occurred while saving file",
     });
-    return;
+    return false;
   }
   if (file.data.version === null) {
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "This file does not have a current version",
     });
-    return;
+    return false;
   }
 
   // load the storage object
   const object = await supabase.rpc("get_storage_object_by_id", { object_id: file.data.version.object_id });
   if (object.error) {
     console.error(object.error);
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "An error occurred while saving file",
     });
-    return;
+    return false;
   }
-  if(object.data.path_tokens === null) {
+  if (object.data.path_tokens === null) {
     console.error("no path tokens!");
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "An error occurred while saving file",
     });
-    return;
+    return false;
   }
 
   // get doc contents
@@ -83,11 +81,11 @@ export const save: Action = async () => {
     blob = await getFileBlob();
   } catch (e) {
     console.error(e);
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "An error occurred while saving file",
     });
-    return;
+    return false;
   }
 
   const res = await supabase.storage.from(file.data.project_id).update(
@@ -100,16 +98,20 @@ export const save: Action = async () => {
     }
   );
 
-  if(res.error) {
+  if (res.error) {
     console.error(res.error);
-    await displayDialog({
+    displayDialog({
       title: "Unable to Save",
       description: "File was saved locally, but not to ProjDocs!",
     });
-    return;
+    return false;
   }
 
   Office.context.document.settings.set(CONSTANTS.SETTINGS.LAST_SAVE_HASH, blob.hash);
-  await saveSettings()
+  await saveSettings();
+  return true;
+}
 
+export const save: Action = async () => {
+  await _save();
 };

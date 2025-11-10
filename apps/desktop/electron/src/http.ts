@@ -58,6 +58,34 @@ function buildApp() {
     electron: process.versions.electron
   }));
 
+  app.get("/checkin", async (req, res) => {
+
+    if (!auth) return res.status(500).json({ error: "unable to access authentication" });
+
+    const url = new URL(`https://${HOST}:${PORT}${req.url}`);
+    const fileNumber = url.searchParams.get("file-number");
+    if (!fileNumber) return res.status(400).json({ error: "`file-id` query parameter is required" });
+    const docPath = url.searchParams.get("doc-path");
+    if(!docPath) return res.status(400).json({ error: "`doc-path` query parameter is required" });
+
+    // get file row
+    const supabase = createClientImpl(auth.supabase.url, auth.supabase.key, async () => auth?.token ?? null);
+    const file = await supabase.from("files").update({ locked_by_user_id: null, }).eq("number", Number(fileNumber)).select().single();
+    if (file.error) return res.status(500).json({ error: "unable to checkout file", detail: file.error });
+
+    // delete local file
+    try {
+      const resolved = path.resolve(docPath);
+      if (fs.existsSync(resolved)) fs.unlinkSync(resolved);
+      else return res.status(400).json({ error: "file does not exist" });
+    } catch (err) {
+      return res.status(500).json({ error: "unable to delete file", detail: err });
+    }
+
+    // done
+    return res.status(200).json({ ok: true });
+  })
+
   app.get("/checkout", async (req, res) => {
 
     const fileID = req.query["file-id"];

@@ -13,7 +13,7 @@ import { Button } from "@workspace/ui/components/button";
 import {
   FileSelectorParentMessage,
   FileSelectorParentMessageTypes
-} from "@workspace/word/lib/actions/save-as-new-document";
+} from "@workspace/word/surfaces/ribbon/actions/save-as-new-document";
 
 
 

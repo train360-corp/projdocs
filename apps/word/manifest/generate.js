@@ -57,17 +57,17 @@ const replacements = [
     replace: CONSTANTS.WORD.TAB.GROUPS.A.ID,
   },
   {
-    find: /__LAUNCH_BUTTON_ID__/g,
-    replace: CONSTANTS.BUTTONS.LAUNCH.ID
+    find: /__RETURN_DOC_BTN_ID__/g,
+    replace: CONSTANTS.BUTTONS.CHECK_IN.ID
+  },
+  {
+    find: /__RETURN_DOC_FUNC_ID__/g,
+    replace: CONSTANTS.BUTTONS.CHECK_IN.FUNC_ID
   },
   // GROUP B
   {
     find: /__GROUP_B_ID__/g,
     replace: CONSTANTS.WORD.TAB.GROUPS.B.ID,
-  },
-  {
-    find: /__LAUNCH_FUNC_ID__/g,
-    replace: CONSTANTS.BUTTONS.LAUNCH.FUNC_ID
   },
   {
     find: /__SAVE_BUTTON_ID__/g,

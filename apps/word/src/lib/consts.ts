@@ -34,7 +34,7 @@ export const CONSTANTS = {
         },
         C: {
           ID: "PD.CT.GC"
-        }
+        },
       } satisfies {
         [key: string]: {
           ID: `PD.CT.G${string}`,
@@ -43,12 +43,12 @@ export const CONSTANTS = {
     }
   },
   BUTTONS: {
-    LAUNCH: { ID: "LaunchProjDocsButton", FUNC_ID: "launch" },
+    CHECK_IN: { ID: "CheckIn", FUNC_ID: "checkIn" },
     SAVE: { ID: "SaveButton", FUNC_ID: "save" },
     SAVE_AS_NEW_VERSION: { ID: "SaveAsNewVersionButton", FUNC_ID: "saveAsNewVersion" },
     SAVE_AS_NEW_DOCUMENT: { ID: "SaveAsNewDocumentButton", FUNC_ID: "saveAsNewDoc" },
     INSERT: { ID: "InsertDocID", FUNC_ID: "insertDocID" },
-  },
+  } satisfies { [id: string]: { ID: string, FUNC_ID: string } },
   DESKTOP: {
     HTTP_SERVER: {
       ORIGIN: "https://localhost:9305"

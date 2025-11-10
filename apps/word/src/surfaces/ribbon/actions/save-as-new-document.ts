@@ -64,7 +64,7 @@ export const saveAsNewFile: Action = async () => {
               const supabase = createClient();
               const uid = await supabase.rpc("get_user_id");
               if (uid.error || !uid.data) {
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Save",
                   description: "An error occurred while saving file",
                 });
@@ -77,7 +77,7 @@ export const saveAsNewFile: Action = async () => {
                 locked_by_user_id: uid.data,
               }).select().single();
               if (fileRow.error) {
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Save",
                   description: "An error occurred while saving file",
                 });
@@ -100,7 +100,7 @@ export const saveAsNewFile: Action = async () => {
                 Office.context.document.settings.remove(CONSTANTS.SETTINGS.FILE_REF);
                 Office.context.document.settings.remove(CONSTANTS.SETTINGS.VERSION_REF);
                 await saveSettings();
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Save",
                   description: "An error occurred while saving file",
                 });
@@ -124,7 +124,7 @@ export const saveAsNewFile: Action = async () => {
                 });
 
               if (res.error) {
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Save",
                   description: "An error occurred while saving file",
                 });
@@ -140,7 +140,7 @@ export const saveAsNewFile: Action = async () => {
                 } catch (e) {
                   console.error("unable to log error:", e);
                 }
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Checkout File",
                   description: `File saved successfully, but an error occurred while opening it (${checkout.status})`,
                   onClose: async () => await Word.run(async (context) => {
@@ -164,7 +164,7 @@ export const saveAsNewFile: Action = async () => {
 
               } catch (e) {
                 console.error(e);
-                await displayDialog({
+                displayDialog({
                   title: "Unable to Checkout File",
                   description: "File saved successfully, but an error occurred while opening it",
                   onClose: async () => await Word.run(async (context) => {
