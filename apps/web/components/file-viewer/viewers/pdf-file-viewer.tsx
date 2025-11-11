@@ -25,7 +25,7 @@ export const PDFFileViewer = ({ data: { blob } }: FileViewerProps) => {
       const canvas = document.createElement("canvas");
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      canvas.className = "w-full h-auto border shadow last:mb-0 mb-6";
+      canvas.className = "w-full h-auto border shadow last:mb-0 mb-2";
 
       const context = canvas.getContext("2d")!;
       await page.render({ canvasContext: context, viewport, canvas }).promise;
@@ -35,7 +35,7 @@ export const PDFFileViewer = ({ data: { blob } }: FileViewerProps) => {
   }, [ blob.size ]);
 
   return (
-    <div className="w-full h-full overflow-auto bg-gray-50 p-4 rounded-lg shadow-inner">
+    <div className="w-full h-full overflow-auto bg-muted p-4 rounded-lg shadow-inner">
       <div ref={containerRef} className="flex flex-col items-center gap-4"/>
     </div>
   );

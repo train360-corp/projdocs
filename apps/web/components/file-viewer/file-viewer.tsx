@@ -166,7 +166,7 @@ export const FileViewer = (props: {
         </Card>
 
         {/* SIDEBAR */}
-        <Card className={"p-4 w-full max-w-full lg:w-[33%] lg:max-w-[33%]"}>
+        <Card className={"p-4 h-fit w-full max-w-full lg:w-[33%] lg:max-w-[33%]"}>
 
 
           <div className="flex flex-col gap-1">
@@ -281,6 +281,7 @@ export const FileViewer = (props: {
 
           </div>
         </Card>
+
       </div>
     </DropzoneWrapper>
   );
