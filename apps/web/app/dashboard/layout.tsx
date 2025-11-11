@@ -4,7 +4,7 @@ import { DashboardLayout } from "@workspace/web/components/_layout";
 
 
 
-export default async function LoginGuard({ children }: {
+export default function Layout({ children }: {
   children: ReactNode;
 }) {
   return (

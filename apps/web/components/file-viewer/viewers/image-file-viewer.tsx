@@ -5,7 +5,7 @@ import { FileViewerProps } from "@workspace/web/components/file-viewer/types";
 
 
 
-export const ImageFileViewer = ({ blob }: FileViewerProps) => {
+export const ImageFileViewer = ({ data: { blob } }: FileViewerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

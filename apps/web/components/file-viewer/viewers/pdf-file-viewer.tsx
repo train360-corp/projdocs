@@ -6,7 +6,7 @@ import { usePDFJS } from "@workspace/web/hooks/use-pdfjs";
 
 
 
-export const PDFFileViewer = ({ blob }: FileViewerProps) => {
+export const PDFFileViewer = ({ data: { blob } }: FileViewerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   usePDFJS(async (pdfjs) => {

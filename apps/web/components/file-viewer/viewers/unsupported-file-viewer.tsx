@@ -4,7 +4,7 @@ import { Button } from "@workspace/ui/components/button";
 
 
 
-export const UnsupportedFileViewer = ({ blob, file, version }: FileViewerProps) => {
+export const UnsupportedFileViewer = ({ data: { blob }, file, version }: FileViewerProps) => {
   const url = URL.createObjectURL(blob);
 
   return (

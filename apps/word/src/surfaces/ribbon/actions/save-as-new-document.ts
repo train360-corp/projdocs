@@ -124,6 +124,7 @@ export const saveAsNewFile: Action = async () => {
                   metadata: {
                     file_id: fileRow.data.id,
                     directory_id: msg.body.directory.id,
+                    version_id: null,
                     filename: filename,
                     preview: (await blobToDataUri(previewBlob)) satisfies string,
                   }

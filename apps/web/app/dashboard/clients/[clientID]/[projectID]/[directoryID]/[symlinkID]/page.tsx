@@ -1,11 +1,37 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { FilePage } from "@workspace/ui/pages/file";
+import { use } from "react";
+import { WithSupabaseClient } from "@workspace/web/lib/supabase/client";
 
-import { PageContent } from "@workspace/ui/components/page-content";
 
 
+export default function Page({ params }: {
+  params: Promise<{
+    clientID: string;
+    projectID: string;
+    directoryID: string;
+    symlinkID: string;
+  }>;
+}) {
 
-export default function Page() {
+  const { clientID, projectID, directoryID, symlinkID } = use(params);
+  const router = useRouter();
+
   return (
-    <PageContent />
-  )
+    <WithSupabaseClient>
+      {(supabase) => (
+        <FilePage
+          navigate={(url) => router.push(url)}
+          supabase={supabase}
+          clientID={clientID}
+          projectID={projectID}
+          directoryID={directoryID}
+          symlinkID={symlinkID}
+          disableFileSelection
+          disableDirectorySelection
+        />
+      )}
+    </WithSupabaseClient>
+  );
 }

@@ -80,6 +80,7 @@ export const saveAsNewVersion: Action = async () => {
         metadata: {
           file_id: file.data.id,
           directory_id: null,
+          version_id: null,
           filename: baseFileName.toLowerCase().endsWith(".docx") ? baseFileName : `${baseFileName}.docx`,
           preview: (await blobToDataUri(previewBlob)) satisfies string,
         }

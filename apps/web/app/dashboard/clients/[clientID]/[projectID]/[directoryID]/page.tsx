@@ -27,7 +27,8 @@ export default function Page({ params }: {
           clientID={clientID}
           projectID={projectID}
           directoryID={directoryID}
-          disableFileSelection={false}
+          disableFileSelection
+          disableDirectorySelection
         />
       )}
     </WithSupabaseClient>

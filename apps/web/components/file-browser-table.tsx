@@ -64,11 +64,15 @@ function Clickable<T extends HTMLElement>(props: {
       clickTimeout.current = null;
       if (props.onDoubleClick !== undefined) props.onDoubleClick();
     } else {
-      // immediately fire first click
-      if (props.onSingleClick !== undefined) props.onSingleClick();
+      if(props.onSingleClick === undefined) {
+        if(props.onDoubleClick) props.onDoubleClick();
+      } else {
+        // immediately fire first click
+        props.onSingleClick();
 
-      // Start a timer to detect whether a second click follows soon
-      clickTimeout.current = setTimeout(() => clickTimeout.current = null, 500); // 500ms is default on windows: https://learn.microsoft.com/en-us/windows/win32/controls/ttm-setdelaytime?redirectedfrom=MSDN#remarks
+        // Start a timer to detect whether a second click follows soon
+        clickTimeout.current = setTimeout(() => clickTimeout.current = null, 500); // 500ms is default on windows: https://learn.microsoft.com/en-us/windows/win32/controls/ttm-setdelaytime?redirectedfrom=MSDN#remarks
+      }
     }
   };
 

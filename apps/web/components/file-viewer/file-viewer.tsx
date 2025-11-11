@@ -103,7 +103,7 @@ export const FileViewer = (props: {
     })();
   }, [ state.version?.version ]);
 
-  const className = "h-full w-full overflow-auto flex flex-row gap-4 md:gap-6";
+  const className = "h-full w-full overflow-auto flex flex-col flex-col-reverse gap-4 lg:flex-row lg:gap-6";
 
   if (state.data === null || state.data === undefined || versions.rows === undefined) return (
     <div className={className}>
@@ -157,20 +157,20 @@ export const FileViewer = (props: {
     >
       <div className={className}>
         {/* VIEWER */}
-        <Card className={"py-0 w-[66%] max-w-[66%]"}>
+        <Card className={"py-0 w-full max-w-full lg:w-[66%] lg:max-w-[66%]"}>
           <FileViewers
-            blob={state.data.blob}
+            data={state.data}
             version={state.version}
             file={props.file}
           />
         </Card>
 
         {/* SIDEBAR */}
-        <Card className={"p-4 w-[33%] max-w-[33%]"}>
+        <Card className={"p-4 w-full max-w-full lg:w-[33%] lg:max-w-[33%]"}>
 
 
           <div className="flex flex-col gap-1">
-            <Badge variant={"secondary"} className="h-5 min-w-5 rounded-full px-1 font-mono tabular-nums">
+            <Badge variant={"secondary"} className="h-5 min-w-5 rounded-full px-2 font-mono tabular-nums">
               {`File No. ${props.file.number}`}
             </Badge>
 
