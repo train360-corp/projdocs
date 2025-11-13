@@ -43,6 +43,25 @@ _fatal() {
 }
 
 # ============================================================
+# Utils
+# ============================================================
+
+_require() {
+  local cmd="$1"
+  local msg="${2:-}"
+
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    if [[ -n "$msg" ]]; then
+      _fatal "$msg"
+    else
+      _fatal "required command '$cmd' not found in PATH"
+    fi
+  else
+    _debug "found required command: $cmd"
+  fi
+}
+
+# ============================================================
 # Header
 # ============================================================
 _printHeader() {
@@ -75,7 +94,10 @@ _install() {
       ;;
     Darwin)
       _debug "detected os: macOS"
-      _fatal "not implemented"
+      _require docker "install docker to continue: https://docs.docker.com/desktop/setup/install/mac-install/"
+
+
+      _fatal "implementation not completed"
       ;;
     CYGWIN*|MINGW*|MSYS*)
       _debug "Detected Windows (POSIX environment)"
