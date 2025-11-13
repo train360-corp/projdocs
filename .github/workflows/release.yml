@@ -26,4 +26,4 @@ jobs:
         action:
           - ./github/workflows/build-web.yml
           - ./github/workflows/build-desktop.yml
-      uses: ${{ matrix.action }}
+    uses: ${{ matrix.action }}
