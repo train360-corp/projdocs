@@ -1,13 +1,12 @@
 name: Deploy `word` to GitHub Pages
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'apps/word/**'
-      - '.github/workflows/build-and-deploy-word.yml'
+  workflow_call:
+    inputs:
+      version:
+        description: "Version string to inject into the build"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -15,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: 'build'
   cancel-in-progress: true
 
 jobs:

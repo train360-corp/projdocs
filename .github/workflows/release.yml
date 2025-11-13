@@ -6,13 +6,14 @@ on:
       type:
         type: choice
         description: "Version bump type"
-        options: [PATCH, MINOR, MAJOR]
+        options: [ PATCH, MINOR, MAJOR ]
         default: PATCH
         required: true
 
 permissions:
   contents: write  # needed to push tags & create releases
   packages: write
+  id-token: write
 
 jobs:
 
@@ -24,5 +25,11 @@ jobs:
   web:
     needs: version
     uses: ./.github/workflows/build-web.yml
+    with:
+      version: ${{ needs.version.outputs.next }}
+
+  word:
+    needs: version
+    uses: ./.github/workflows/build-and-deploy-word.yml
     with:
       version: ${{ needs.version.outputs.next }}

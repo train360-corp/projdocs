@@ -11,6 +11,10 @@ on:
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
+concurrency:
+  group: 'build'
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
