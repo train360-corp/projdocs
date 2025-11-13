@@ -1,34 +1,46 @@
-name: Build (Web)
+name: "Build (Web)"
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'apps/web/**'
-      - '.github/workflows/build-web.yml'
+  workflow_call:
+    inputs:
+      version:
+        description: "Version string to inject into the build"
+        required: false
+        type: string
+    secrets: {}
+    outputs:
+      image:
+        description: "The built image name (if applicable)"
+        value: ${{ jobs.build.outputs.image }}
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      id-token: write # required for GitHub OIDC token authentication
+      id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: setup node
+        uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: 'npm'
+          cache: npm
 
-      - run: npm i
+      - name: install dependencies
+        run: npm ci
 
-      - run: npm run build
+      - name: build web app
         working-directory: ./apps/web
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          echo "building web with VERSION=${VERSION}"
+          npm run build

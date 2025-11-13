@@ -22,4 +22,6 @@ jobs:
 
   web:
     needs: version
-    uses: .github/workflows/build-web.yml
+    uses: ./.github/workflows/build-web.yml
+    with:
+      version: ${{ needs.version.outputs.next }}
