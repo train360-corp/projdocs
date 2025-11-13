@@ -16,14 +16,13 @@ permissions:
 jobs:
 
   version:
+    id: version
     uses: train360-corp/actions/.github/workflows/get-release-version.yml@main
     with:
       bump-type: ${{ github.event.inputs.type }}
 
-  build:
-    strategy:
-      matrix:
-        action:
-          - ./github/workflows/build-web.yml
-          - ./github/workflows/build-desktop.yml
-    uses: ${{ matrix.action }}
+  web:
+    needs: version
+    uses: ./.github/workflows/build-web.yml
+    env:
+      VERSION: ${{ needs.version.outputs.next }}
