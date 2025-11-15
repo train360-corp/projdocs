@@ -4,18 +4,24 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3030 --turbopack",
+    "gen": "openapi-ts -f src/lib/docker/openai-ts.config.ts"
   },
   "dependencies": {
+    "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
+    "luxon": "^3.7.2",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.87.5",
     "@tailwindcss/postcss": "^4",
+    "@types/luxon": "^3.7.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

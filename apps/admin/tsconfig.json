@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@workspace/admin/*": ["./*"],
+      "@workspace/admin/*": ["./src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
       "@workspace/consts/*": ["../../packages/consts/src/*"],
       "@workspace/supabase/*": ["../../packages/supabase/*"]
@@ -14,6 +14,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
+    "allowImportingTsExtensions": true,
     "plugins": [
       {
         "name": "next"

@@ -1,4 +1,7 @@
 export const CONSTANTS = {
+  DOCKER: {
+    LABEL: "com.projdocs"
+  } as const,
   VALIDATORS: {
     FILENAME: /^(?!\.)(?!.*[\\/])(?!.*\.\.)[A-Za-z0-9._ -]+$/
   } satisfies {
