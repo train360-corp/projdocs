@@ -3,7 +3,7 @@
 
 import { Button } from "@workspace/ui/components/button.tsx";
 import { DockerService } from "../../../app/dashboard/page.tsx";
-import { onClick } from "./action.ts";
+import { createContainer } from "./action.ts";
 import { ContainerInspectResponses } from "@workspace/admin/lib/docker/gen";
 import { LoaderIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -11,13 +11,13 @@ import { toast } from "sonner";
 
 
 
-export default ({ svc, container }: {
+export const CreateContainerButton = ({ svc, container }: {
   svc: DockerService;
   container: ContainerInspectResponses["200"] | undefined;
 }) => {
 
-  const [loading, setLoading] = useState(false);
-  const exists = container?.Id !== undefined
+  const [ loading, setLoading ] = useState(false);
+  const exists = container?.Id !== undefined;
   const disabled = loading || exists;
 
   return (
@@ -28,7 +28,7 @@ export default ({ svc, container }: {
       onClick={async () => {
         setLoading(true);
         try {
-          await onClick({ svc })
+          await createContainer({ svc });
         } catch (error) {
           toast.error("An Error Occurred!");
           console.error(error);
@@ -37,10 +37,10 @@ export default ({ svc, container }: {
         }
       }}
     >
-      { loading
-        ? <LoaderIcon />
-        : <PlusIcon />
+      {loading
+        ? <LoaderIcon/>
+        : <PlusIcon/>
       }
     </Button>
   );
-}
+};

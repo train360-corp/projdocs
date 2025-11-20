@@ -4,11 +4,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { docker } from "@workspace/admin/lib/docker";
 import { ContainerInspectResponses, Service } from "@workspace/admin/lib/docker/gen";
 import { ReactNode } from "react";
-import CreateClientButton from "@workspace/admin/components/create-container-button";
 import { Badge } from "@workspace/ui/components/badge.tsx";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip.tsx";
 import { DateTime } from "luxon";
 import { cn } from "@workspace/ui/lib/utils.ts";
+import { CreateContainerButton } from "@workspace/admin/components/docker-buttons/create-container.tsx";
+import { StartContainerButton } from "@workspace/admin/components/docker-buttons/start-container.tsx";
+import { DockerService } from "@workspace/admin/lib/docker/types.ts";
 
 
 
@@ -25,19 +27,11 @@ type FilterKeys<T, Values = string | undefined> = {
   [K in keyof T]: T[K] extends Values ? K : never
 }[keyof T];
 
-export enum DockerService {
-  DB = `projdocs-db`,
-  REALTIME = `projdocs-realtime`,
-  KONG = "projdocs-kong",
-}
-
 const Image = async ({ sha }: {
   sha: string;
 }) => {
 
   const { data } = await docker.imageInspect({ path: { name: sha } });
-
-  console.log(data);
 
   if (data && data.RepoTags && data.RepoTags.length > 0) return (
     <Tooltip>
@@ -105,8 +99,14 @@ const columns: ReadonlyArray<{
   {
     display: "Actions",
     value: (c, id) => (
-      <div>
-        <CreateClientButton container={c} svc={id}/>
+      <div className={"flex flex-row items-center justify-end"}>
+        {c?.Id === undefined ? (
+          <CreateContainerButton container={c} svc={id}/>
+        ) : (
+          <>
+            <StartContainerButton container={c} />
+          </>
+        )}
       </div>
     )
   }
@@ -175,6 +175,7 @@ export default async function () {
               <Container service={DockerService.KONG}/>
               <Container service={DockerService.DB}/>
               <Container service={DockerService.REALTIME}/>
+              <Container service={DockerService.REST} />
             </TableBody>
           </Table>
         </Card>

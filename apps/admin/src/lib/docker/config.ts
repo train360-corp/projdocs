@@ -1,43 +1,42 @@
-"use server";
-
-import { docker } from "@workspace/admin/lib/docker";
-import { DockerService } from "../../../app/dashboard/page.tsx";
 import { ContainerCreateData } from "@workspace/admin/lib/docker/gen";
-import { CONSTANTS } from "@workspace/consts/consts.ts";
-import { kv, KvKeys } from "@workspace/admin/lib/db/kv.ts";
-import path from "node:path";
-import os from "node:os";
 import fs from "node:fs";
+import path from "node:path";
 import axios from "axios";
+import process from "node:process";
+import { CONSTANTS } from "@workspace/consts/consts.ts";
+import os from "node:os";
+import { kv, KvKeys } from "@workspace/admin/lib/db/kv.ts";
 import { random } from "@workspace/admin/lib/random.ts";
+import { DockerService } from "@workspace/admin/lib/docker/types.ts";
 
 
 
-const download = async (url: string, outputPath: string): Promise<string> => {
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.rmSync(outputPath, { force: true });
-  const writer = fs.createWriteStream(outputPath);
-  try {
-    const response = await axios.get(url, { responseType: "stream", });
-    if (response.status !== 200) throw new Error(response.data);
-    await new Promise<void>((resolve, reject) => {
-      response.data.pipe(writer);
-      writer.on("finish", () => resolve());
-      writer.on("error", reject);
-    });
-  } catch (err) {
-    console.error(`Failed to download ${url}`, err);
-  } finally {
-    writer.close();
+export const getContainerConfig = async (svc: DockerService): Promise<ContainerCreateData["body"]> => {
+
+
+  const download = async (url: string, outputPath: string): Promise<string> => {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.rmSync(outputPath, { force: true });
+    const writer = fs.createWriteStream(outputPath);
+    try {
+      const response = await axios.get(url, { responseType: "stream", });
+      if (response.status !== 200) throw new Error(response.data);
+      await new Promise<void>((resolve, reject) => {
+        response.data.pipe(writer);
+        writer.on("finish", () => resolve());
+        writer.on("error", reject);
+      });
+    } catch (err) {
+      console.error(`Failed to download ${url}`, err);
+    } finally {
+      writer.close();
+    }
+    return outputPath;
+  };
+
+  function seconds(sec: number): bigint {
+    return sec * 1_000_000_000 as unknown as bigint;
   }
-  return outputPath;
-};
-
-function seconds(sec: number): bigint {
-  return sec * 1_000_000_000 as unknown as bigint;
-}
-
-const getContainerConfig = async (svc: DockerService): Promise<ContainerCreateData["body"]> => {
 
   const port = process.env.PORT;
   if (!port) throw new Error(`'PORT' is undefined`);
@@ -50,6 +49,26 @@ const getContainerConfig = async (svc: DockerService): Promise<ContainerCreateDa
   };
 
   switch (svc) {
+
+    case DockerService.REST:
+      return {
+        ...shared,
+        Image: "postgrest/postgrest:v13.0.7",
+        HostConfig: {
+          NetworkMode: CONSTANTS.DOCKER.NETWORK,
+          RestartPolicy: { Name: "unless-stopped" },
+        },
+        Env: [
+          `PGRST_DB_URI=postgres://authenticator:${kv.get(KvKeys.POSTGRES_PASSWORD)}@${kv.get(KvKeys.POSTGRES_HOST)}:${kv.get(KvKeys.POSTGRES_PORT)}/${kv.get(KvKeys.POSTGRES_DB)}`,
+          `PGRST_DB_SCHEMAS=public,storage`,
+          `PGRST_DB_ANON_ROLE=anon`,
+          `PGRST_JWT_SECRET=${kv.get(KvKeys.JWT_SECRET)}`,
+          `PGRST_DB_USE_LEGACY_GUCS=false`,
+          `PGRST_APP_SETTINGS_JWT_SECRET=${kv.get(KvKeys.JWT_SECRET)}`,
+          `PGRST_APP_SETTINGS_JWT_EXP=3600`,
+        ],
+        Cmd: [ "postgrest" ]
+      } satisfies ContainerCreateData["body"];
 
     case DockerService.KONG:
 
@@ -88,7 +107,7 @@ const getContainerConfig = async (svc: DockerService): Promise<ContainerCreateDa
             }
           }
         }
-      };
+      } satisfies ContainerCreateData["body"];
 
     case DockerService.REALTIME:
       return {
@@ -199,26 +218,4 @@ const getContainerConfig = async (svc: DockerService): Promise<ContainerCreateDa
         }
       } satisfies ContainerCreateData["body"];
   }
-};
-
-export const onClick = async ({ svc }: { svc: DockerService }) => {
-
-
-  // create network
-  const net = await docker.networkInspect({ path: { id: CONSTANTS.DOCKER.NETWORK } });
-  if (!net.data?.Id) await docker.networkCreate({ body: { Name: CONSTANTS.DOCKER.NETWORK } });
-
-  const cfg = await getContainerConfig(svc);
-
-  // pull the image
-  const { error: pullError } = await docker.imageCreate({ query: { fromImage: cfg.Image } });
-  if (pullError) {
-    console.error(pullError);
-    return;
-  }
-
-  // create the container
-  const resp = await docker.containerCreate({ query: { name: svc, }, body: cfg });
-  if (resp.error) console.error(resp.error);
-  else console.log(resp.data);
 };
